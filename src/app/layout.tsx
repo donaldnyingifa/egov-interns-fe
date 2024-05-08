@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
+import { cn } from "@/lib/utils";
 
-export const open_sans = Open_Sans({
+const open_sans = Open_Sans({
   weight: ["400", "700"],
   subsets: ["latin-ext"],
 });
@@ -19,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={open_sans.className}>{children}</body>
+      <body className={cn(open_sans.className, "relative overflow-x-hidden")}>
+        {children}
+      </body>
     </html>
   );
 }
