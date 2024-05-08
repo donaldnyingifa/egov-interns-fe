@@ -14,3 +14,5 @@ export const MaxWidthContainer = React.forwardRef<
     </div>
   );
 });
+
+MaxWidthContainer.displayName = "MaxWidthContainer";
