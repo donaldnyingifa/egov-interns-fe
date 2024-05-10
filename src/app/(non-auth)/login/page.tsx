@@ -55,7 +55,7 @@ const Page = () => {
       <h1 className="font-bold text-3xl">Log In</h1>
       <p className="mt-2">Login to you account</p>
       <p className="text-sm">
-        Don't have an account?{" "}
+        Don&apos;t have an account?{" "}
         <Link href="/signup" className="underline">
           {" "}
           Sign Up Now
