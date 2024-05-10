@@ -41,7 +41,7 @@ const FormSchema = z.object({
   }),
 });
 
-const page = () => {
+const Page = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [showPassword, setshowPassword] = useState(false);
 
@@ -231,4 +231,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
