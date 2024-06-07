@@ -1,10 +1,11 @@
 "use client";
+
 import React, { ReactNode, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { Loader } from "@/components/Loader";
 
-const layout = ({ children }: { children: ReactNode }) => {
+const Layout = ({ children }: { children: ReactNode }) => {
   const { user, loading } = useAuth();
   const router = useRouter();
 
@@ -12,7 +13,7 @@ const layout = ({ children }: { children: ReactNode }) => {
     if (!loading && !user) {
       return router.push("/login");
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   if (!user) {
     return <Loader />;
@@ -21,4 +22,4 @@ const layout = ({ children }: { children: ReactNode }) => {
   return children;
 };
 
-export default layout;
+export default Layout;

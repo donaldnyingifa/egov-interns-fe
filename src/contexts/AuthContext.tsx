@@ -1,14 +1,9 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+"use client";
+import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { API } from "@/api";
 import { toast } from "@/components/ui/use-toast";
 
-const AuthContext = createContext<any>(null);
+export const authContext = createContext<any>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState(null);
@@ -87,12 +82,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, signup }}>
+    <authContext.Provider value={{ user, loading, login, logout, signup }}>
       {children}
-    </AuthContext.Provider>
+    </authContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  return useContext(AuthContext);
 };

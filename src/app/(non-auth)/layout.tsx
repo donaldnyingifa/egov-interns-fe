@@ -1,9 +1,10 @@
 "use client";
+
 import { MaxWidthContainer } from "@/components/MaxWidthContainer";
 import Image from "next/image";
 import Link from "next/link";
 import React, { ReactNode, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { Loader } from "@/components/Loader";
 
@@ -15,7 +16,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
     if (user && !loading) {
       return router.push("/home");
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   if (loading || (!loading && !!user)) {
     return <Loader />;

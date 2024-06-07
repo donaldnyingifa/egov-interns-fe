@@ -1,11 +1,12 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
-import { useAuth } from "../../../contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
-const page = () => {
+const Page = () => {
   const { user } = useAuth();
 
   return (
@@ -68,4 +69,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
