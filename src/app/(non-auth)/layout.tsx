@@ -1,9 +1,26 @@
+"use client";
 import { MaxWidthContainer } from "@/components/MaxWidthContainer";
 import Image from "next/image";
 import Link from "next/link";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { Loader } from "@/components/Loader";
 
 const Layout = ({ children }: { children: ReactNode }) => {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user && !loading) {
+      return router.push("/home");
+    }
+  }, [user, loading]);
+
+  if (loading || (!loading && !!user)) {
+    return <Loader />;
+  }
+
   return (
     <>
       <nav className="shadow-md">

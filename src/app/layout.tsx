@@ -3,6 +3,7 @@ import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
+import { Providers } from "@/components/Providers";
 
 const open_sans = Open_Sans({
   weight: ["400", "700"],
@@ -22,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(open_sans.className, "relative overflow-x-hidden")}>
-        {children}
+        <Providers>{children}</Providers>
         <Toaster />
       </body>
     </html>
