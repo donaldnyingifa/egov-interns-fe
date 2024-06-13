@@ -3,10 +3,23 @@ import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { API } from "@/api";
 import { toast } from "@/components/ui/use-toast";
 
+export type UserData = {
+  uid: "string";
+  email: string;
+  password: string;
+  username: string;
+  bio: string;
+  firstName: string;
+  lastName: string;
+  dob: Date;
+  schoolName: string;
+  schoolDepartment: string;
+};
+
 export const authContext = createContext<any>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,6 +42,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.removeItem("token");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateProfile = async (data: any) => {
+    try {
+      const response = await API.patch("/user/" + user?.uid, data);
+      setUser(response.data.user);
+      toast({ description: "Profile updated successfully" });
+    } catch (error: any) {
+      setUser(user);
+      toast({ description: "Error could not update profile" });
     }
   };
 
@@ -82,7 +106,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <authContext.Provider value={{ user, loading, login, logout, signup }}>
+    <authContext.Provider
+      value={{ user, loading, login, logout, signup, updateProfile }}
+    >
       {children}
     </authContext.Provider>
   );

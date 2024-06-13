@@ -101,7 +101,7 @@ export default function Page() {
           </div>
 
           <p className="mt-2 text-sm">
-            {user.status ?? "Feel free to follow me, I don't bite 😁"}
+            {user.bio ?? "Feel free to follow me, I don't bite 😁"}
           </p>
 
           <div className="flex mt-2 gap-2">
