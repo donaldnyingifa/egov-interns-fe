@@ -50,6 +50,7 @@ const FormSchema = z.object({
 const Page = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [showPassword, setshowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { signup } = useAuth();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -66,7 +67,9 @@ const Page = () => {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
+    setIsLoading(true);
     await signup(data);
+    setIsLoading(false);
   }
 
   return (
