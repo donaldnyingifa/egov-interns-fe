@@ -34,6 +34,7 @@ const FormSchema = z.object({
   username: z.string().min(1, {
     message: "Username is required.",
   }),
+  email: z.string().email({ message: "A valid email is required" }),
   bio: z.string().min(1, {
     message: "Bio is required.",
   }),
@@ -60,7 +61,8 @@ export const EditProfile = () => {
       firstName: user.firstName,
       lastName: user.lastName,
       username: user.username,
-      bio: user.bio,
+      email: user.email,
+      bio: user.bio ?? "Feel free to follow me, I don't bite 😁",
       schoolName: user.schoolName,
       schoolDepartment: user.schoolDepartment,
       dob: new Date(user.dob),
@@ -101,6 +103,20 @@ export const EditProfile = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-medium">Username*</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-medium">Email*</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>

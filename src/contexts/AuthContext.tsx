@@ -4,7 +4,7 @@ import { API } from "@/api";
 import { toast } from "@/components/ui/use-toast";
 
 export type UserData = {
-  uid: "string";
+  id: "string";
   email: string;
   password: string;
   username: string;
@@ -39,6 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(response.data.user);
     } catch (error: any) {
       setUser(null);
+      toast({ description: error.response.data.message });
       localStorage.removeItem("token");
     } finally {
       setLoading(false);
@@ -47,7 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const updateProfile = async (data: any) => {
     try {
-      const response = await API.patch("/user/" + user?.uid, data);
+      const response = await API.patch("/users/" + user?.id, data);
       setUser(response.data.user);
       toast({ description: "Profile updated successfully" });
     } catch (error: any) {
@@ -58,7 +59,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (username: string, password: string) => {
     try {
-      setLoading(true);
       const response = await API.post("/login", { username, password });
       setUser(response.data.user);
 
@@ -68,15 +68,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       toast({ description: "Login successful", duration: 3000 });
     } catch (error: any) {
       toast({ description: error.response.data.message });
-    } finally {
-      setLoading(false);
     }
   };
 
   const signup = async (data: any) => {
     try {
-      setLoading(true);
-
       const response = await API.post("/signup", data);
 
       const token = response.data.token;
@@ -86,22 +82,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const user = response.data.user;
       setUser(user);
     } catch (error: any) {
-      toast({ description: error.message });
-    } finally {
-      setLoading(false);
+      toast({ description: error.response.data.message });
     }
   };
 
   const logout = async () => {
     try {
-      setLoading(true);
       localStorage.removeItem("token");
       delete API.defaults.headers.common["Authorization"];
       setUser(null);
     } catch (error) {
       toast({ description: "logout failed" });
-    } finally {
-      setLoading(false);
     }
   };
 
