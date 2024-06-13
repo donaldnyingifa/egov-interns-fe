@@ -1,6 +1,16 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "./ui/button";
 import {
   Form,
   FormControl,
@@ -8,33 +18,24 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+} from "./ui/form";
+import { Input } from "./ui/input";
+import { toast } from "./ui/use-toast";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { CalendarIcon, EyeOffIcon } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Eye } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "./ui/calendar";
 import { useAuth } from "@/hooks/useAuth";
 
 const FormSchema = z.object({
   firstName: z.string().min(1, { message: "Your first name is required" }),
   lastName: z.string().min(1, { message: "Your last name is required" }),
-  email: z.string().email({ message: "A valid email is required" }),
   username: z.string().min(1, {
     message: "Username is required.",
   }),
-  password: z.string().min(8, {
-    message: "Password is required and must be at least 8 characters.",
+  bio: z.string().min(1, {
+    message: "Bio is required.",
   }),
   dob: z.date({
     required_error: "Your date of birth is required.",
@@ -47,43 +48,67 @@ const FormSchema = z.object({
   }),
 });
 
-const Page = () => {
+export const EditProfile = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [showPassword, setshowPassword] = useState(false);
-  const { signup } = useAuth();
+  const { user, updateProfile } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      username: "",
-      password: "",
-      schoolName: "",
-      schoolDepartment: "",
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      bio: user.bio,
+      schoolName: user.schoolName,
+      schoolDepartment: user.schoolDepartment,
+      dob: new Date(user.dob),
     },
   });
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    await signup(data);
-  }
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    try {
+      setLoading(true);
+      console.log(data);
+      await updateProfile(data);
+    } finally {
+      setIsOpen(false);
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="p-4 mx-auto sm:w-[400px]">
-      <h1 className="font-bold text-3xl">Get started</h1>
-      <p className="mt-2">Create a new account</p>
-      <p className="text-sm">
-        Have an account?{" "}
-        <Link href="/login" className="underline">
-          {" "}
-          Sign In Now
-        </Link>
-      </p>
+    <Dialog onOpenChange={setIsOpen} open={isOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          Edit profile
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px] overflow-y-auto h-screen sm:h-[80vh]">
+        <DialogHeader>
+          <DialogTitle>Edit profile</DialogTitle>
+          <DialogDescription>
+            Make changes to your profile here. Click save when you&apos;re done.
+          </DialogDescription>
+        </DialogHeader>
 
-      <div className="mt-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-medium">Username*</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="firstName"
@@ -103,7 +128,7 @@ const Page = () => {
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Last Name*</FormLabel>
+                  <FormLabel className="font-medium">Last Name*</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -114,10 +139,10 @@ const Page = () => {
 
             <FormField
               control={form.control}
-              name="email"
+              name="bio"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email*</FormLabel>
+                  <FormLabel className="font-medium">Bio*</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -128,10 +153,10 @@ const Page = () => {
 
             <FormField
               control={form.control}
-              name="username"
+              name="schoolName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username*</FormLabel>
+                  <FormLabel className="font-medium">School Name*</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -142,30 +167,14 @@ const Page = () => {
 
             <FormField
               control={form.control}
-              name="password"
+              name="schoolDepartment"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password*</FormLabel>
+                  <FormLabel className="font-medium">
+                    School Department*
+                  </FormLabel>
                   <FormControl>
-                    <div className="relative">
-                      <Input
-                        {...field}
-                        type={showPassword ? "text" : "password"}
-                      />
-                      <button
-                        className="absolute top-1 right-2 p-1"
-                        type="button"
-                        onClick={(e) => {
-                          setshowPassword((prev) => !prev);
-                        }}
-                      >
-                        {showPassword ? (
-                          <EyeOffIcon className="w-5" />
-                        ) : (
-                          <Eye className="w-5" />
-                        )}
-                      </button>
-                    </div>
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -203,7 +212,7 @@ const Page = () => {
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={field.value}
+                        selected={field.value ?? new Date(user.dob)}
                         onSelect={(e) => {
                           field.onChange(e);
                           setIsCalendarOpen(false);
@@ -221,42 +230,30 @@ const Page = () => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="schoolName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>School Name*</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+            <Button type="submit" className="mt-8" disabled={loading}>
+              {loading ? "Saving changes" : "Save changes"}
+              {loading && (
+                <svg
+                  aria-hidden="true"
+                  className="w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-white ml-4"
+                  viewBox="0 0 100 101"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                    fill="currentFill"
+                  />
+                </svg>
               )}
-            />
-
-            <FormField
-              control={form.control}
-              name="schoolDepartment"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>School Department*</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button type="submit" className="w-full">
-              Sign Up
             </Button>
           </form>
         </Form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
-
-export default Page;
