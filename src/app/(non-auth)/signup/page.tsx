@@ -15,7 +15,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -25,25 +24,34 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Eye } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const FormSchema = z.object({
-  firstName: z.string().min(1, { message: "First Name is required" }),
-  lastName: z.string().min(1, { message: "Last Name Name is required" }),
-  email: z.string().email(),
-  username: z.string().min(5, {
-    message: "Username must be at least 5 characters.",
+  firstName: z.string().min(1, { message: "Your first name is required" }),
+  lastName: z.string().min(1, { message: "Your last name is required" }),
+  email: z.string().email({ message: "A valid email is required" }),
+  username: z.string().min(1, {
+    message: "Username is required.",
   }),
   password: z.string().min(8, {
-    message: "Username must be at least 8 characters.",
+    message: "Password is required and must be at least 8 characters.",
   }),
   dob: z.date({
-    required_error: "A date of birth is required.",
+    required_error: "Your date of birth is required.",
+  }),
+  schoolName: z.string().min(1, {
+    message: "Your school name is required",
+  }),
+  schoolDepartment: z.string().min(1, {
+    message: "Your department name is required",
   }),
 });
 
 const Page = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [showPassword, setshowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { signup } = useAuth();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -53,20 +61,15 @@ const Page = () => {
       email: "",
       username: "",
       password: "",
+      schoolName: "",
+      schoolDepartment: "",
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data);
-
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    setIsLoading(true);
+    await signup(data);
+    setIsLoading(false);
   }
 
   return (
@@ -216,6 +219,34 @@ const Page = () => {
                       />
                     </PopoverContent>
                   </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="schoolName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>School Name*</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="schoolDepartment"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>School Department*</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
