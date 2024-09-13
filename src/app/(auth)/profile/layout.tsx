@@ -6,7 +6,7 @@ export default function Layout({
   tabs: React.ReactNode;
 }) {
   return (
-    <div className="max-w-lg mx-auto border min-h-screen p-2 sm:p-6">
+    <div className="max-w-lg mx-auto border min-h-screen p-4 sm:p-6">
       {children}
       {tabs}
     </div>
