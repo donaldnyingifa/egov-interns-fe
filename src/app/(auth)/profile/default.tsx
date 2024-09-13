@@ -50,7 +50,7 @@ export default function Page() {
     const file = event.target.files && event.target.files[0];
 
     if (file) {
-      const fileSize = file?.size! / 1_048_576;
+      const fileSize = file?.size! / 1048576;
 
       if (fileSize > 2) {
         return toast({ description: "Maxiumum picture size allowed is 2MB" });
