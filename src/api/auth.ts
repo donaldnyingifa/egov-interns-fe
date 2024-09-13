@@ -5,7 +5,7 @@ export const loginUser = async (username: string, password: string) => {
 };
 
 export const registerUser = async (data: any) => {
-  return await API.post("/login", data);
+  return await API.post("/signup", data);
 };
 
 export const updateUserProfile = async (userId: string, data: any) => {
