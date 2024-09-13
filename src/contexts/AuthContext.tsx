@@ -56,10 +56,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const response = await updateUserProfile(user?.id as string, data);
       setUser(response.data.user);
-      toast({ description: "Profile updated successfully" });
+      toast({
+        description: "Profile updated successfully",
+        duration: 1000,
+      });
     } catch (error: any) {
       setUser(user);
-      toast({ description: "Error could not update profile" });
+      toast({
+        description: "Error could not update profile",
+        duration: 2000,
+        variant: "destructive",
+      });
     }
   };
 
@@ -71,7 +78,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem("token", token);
       API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     } catch (error: any) {
-      toast({ description: error.response.data.message });
+      toast({
+        description: error.response.data.message,
+        duration: 2000,
+        variant: "destructive",
+      });
     }
   };
 
@@ -85,7 +96,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const user = response.data.user;
       setUser(user);
     } catch (error: any) {
-      toast({ description: error.response.data.message });
+      toast({
+        description: error.response.data.message,
+        duration: 2000,
+        variant: "destructive",
+      });
     }
   };
 
@@ -95,7 +110,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       delete API.defaults.headers.common["Authorization"];
       setUser(null);
     } catch (error) {
-      toast({ description: "logout failed" });
+      toast({
+        description: "logout failed",
+        duration: 2000,
+        variant: "destructive",
+      });
     }
   };
 
