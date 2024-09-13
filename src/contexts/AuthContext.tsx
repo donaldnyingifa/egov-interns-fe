@@ -1,7 +1,13 @@
 "use client";
 import React, { createContext, useState, useEffect, ReactNode } from "react";
-import { API } from "@/api";
+import { API } from "../api";
 import { toast } from "@/components/ui/use-toast";
+import {
+  getUserProfile,
+  loginUser,
+  registerUser,
+  updateUserProfile,
+} from "@/api/auth";
 
 export type UserData = {
   id: "string";
@@ -35,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUser = async () => {
     try {
-      const response = await API.get("/user");
+      const response = await getUserProfile();
       setUser(response.data.user);
     } catch (error: any) {
       setUser(null);
@@ -48,33 +54,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const updateProfile = async (data: any) => {
     try {
-      const response = await API.patch("/users/" + user?.id, data);
+      const response = await updateUserProfile(user?.id as string, data);
       setUser(response.data.user);
-      toast({ description: "Profile updated successfully" });
+      toast({
+        description: "Profile updated successfully",
+        duration: 1000,
+      });
     } catch (error: any) {
       setUser(user);
-      toast({ description: "Error could not update profile" });
+      toast({
+        description: "Error could not update profile",
+        duration: 2000,
+        variant: "destructive",
+      });
     }
   };
 
   const login = async (username: string, password: string) => {
     try {
-      const response = await API.post("/login", { username, password });
+      const response = await loginUser(username, password);
       setUser(response.data.user);
-
       const token = response.data.token;
       localStorage.setItem("token", token);
       API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      toast({ description: "Login successful", duration: 3000 });
     } catch (error: any) {
-      toast({ description: error.response.data.message });
+      toast({
+        description: error.response.data.message,
+        duration: 2000,
+        variant: "destructive",
+      });
     }
   };
 
   const signup = async (data: any) => {
     try {
-      const response = await API.post("/signup", data);
-
+      const response = await registerUser(data);
       const token = response.data.token;
       localStorage.setItem("token", token);
       API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -82,7 +96,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const user = response.data.user;
       setUser(user);
     } catch (error: any) {
-      toast({ description: error.response.data.message });
+      toast({
+        description: error.response.data.message,
+        duration: 2000,
+        variant: "destructive",
+      });
     }
   };
 
@@ -92,7 +110,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       delete API.defaults.headers.common["Authorization"];
       setUser(null);
     } catch (error) {
-      toast({ description: "logout failed" });
+      toast({
+        description: "logout failed",
+        duration: 2000,
+        variant: "destructive",
+      });
     }
   };
 
