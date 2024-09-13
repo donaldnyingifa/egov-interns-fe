@@ -12,7 +12,6 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!loading && !user) {
-      toast({ description: "Login session expired" });
       return router.push("/login");
     }
   }, [user, loading, router]);

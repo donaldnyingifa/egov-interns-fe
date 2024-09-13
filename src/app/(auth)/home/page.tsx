@@ -28,7 +28,7 @@ const Page = () => {
               </div>
             ) : (
               <Image
-                src={user.profileImage}
+                src={user.profileImage ?? "/"}
                 alt="Profile Image"
                 width={300}
                 height={300}

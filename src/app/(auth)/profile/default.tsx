@@ -2,14 +2,17 @@
 
 import { EditProfile } from "@/components/EditProfile";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { CameraIcon, Loader2Icon, VerifiedIcon } from "lucide-react";
+import {
+  ArrowBigLeftDashIcon,
+  CameraIcon,
+  Loader2Icon,
+  VerifiedIcon,
+} from "lucide-react";
 import { ChangeEvent, useRef, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
-import { API } from "@/api";
+import { API } from "../../../api";
 import { ProfileImage } from "@/components/ProfileImage";
 
 export default function Page() {
@@ -62,29 +65,18 @@ export default function Page() {
   };
 
   return (
-    <div className="max-w-lg mx-auto border min-h-screen">
-      <div className="p-4 sm:p-8">
-        <Button
+    <div>
+      <div>
+        {/* <Button
           variant="ghost"
           size="icon"
           className="rounded-full"
-          onClick={() => router.back()}
+          onClick={() => router.push("/home")}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-5 h-5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-            />
-          </svg>
-        </Button>
+          <ArrowBigLeftDashIcon />
+        </Button> */}
+
+        <h1 className="text-bold text-lg font-bold">Profile</h1>
 
         <div className="flex justify-between items-center mt-4">
           <div className="relative">
@@ -122,7 +114,7 @@ export default function Page() {
         <div className="mt-6">
           <p className="font-bold">{`${user.firstName} ${user.lastName}`}</p>
 
-          <div className="text-slate-500 text-sm flex items-center gap-1">
+          <div className="text-slate-500 text-sm flex items-center">
             <span title="Verified">
               <VerifiedIcon className="fill-blue-500 text-white w-5 h-5" />
             </span>
@@ -156,40 +148,6 @@ export default function Page() {
             <p className="text-sm">
               {`${user.schoolName}, ${user.schoolDepartment}`}
             </p>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <ul className="border-b-2">
-          <Link
-            href=""
-            className={cn({
-              "px-4 py-2 inline-block border-b-4 border-blue-500 ": true,
-            })}
-          >
-            Posts
-          </Link>
-        </ul>
-
-        <div className="mb-4">
-          <div className="mt-8">
-            <p className="text-center text-slate-800">No posts yet</p>
-
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-20 h-20 text-slate-400/50 mx-auto mt-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
-              />
-            </svg>
           </div>
         </div>
       </div>
