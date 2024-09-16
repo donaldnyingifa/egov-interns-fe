@@ -7,7 +7,7 @@ import {
   loginUser,
   registerUser,
   updateUserProfile,
-} from "@/api/auth";
+} from "../api/auth";
 
 export type UserData = {
   id: "string";

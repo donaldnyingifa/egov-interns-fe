@@ -27,7 +27,7 @@ import { Loader2Icon, PlusCircle } from "lucide-react";
 import { Textarea } from "./ui/textarea";
 import { API } from "../api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addProject } from "@/api/project";
+import { addProject } from "../api/project";
 
 const FormSchema = z.object({
   name: z.string().min(1, { message: "Project name is required" }),
@@ -91,11 +91,13 @@ export const AddProject = () => {
           <span>Add Project</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] overflow-y-auto h-screen sm:h-[80vh]">
-        <DialogHeader>
+      <DialogContent className="overflow-y-auto h-full sm:h-[90%]">
+        <div>
           <DialogTitle>Add a project</DialogTitle>
-        </DialogHeader>
-
+          <DialogDescription className="mt-2">
+            Add a project to your project list.
+          </DialogDescription>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -111,7 +113,6 @@ export const AddProject = () => {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="description"
@@ -127,7 +128,6 @@ export const AddProject = () => {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="technologies"
@@ -146,7 +146,6 @@ export const AddProject = () => {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="link"
@@ -160,7 +159,6 @@ export const AddProject = () => {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="githubRepo"
@@ -176,7 +174,6 @@ export const AddProject = () => {
                 </FormItem>
               )}
             />
-
             <Button type="submit" className="mt-8" disabled={loading}>
               {loading ? "Adding Project.." : "Add Project"}
               {loading && <Loader2Icon className="w-4 h-4 animate-spin" />}

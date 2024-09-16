@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchProjects } from "@/api/project";
+import { fetchProjects } from "../../../../../api/project";
 import { AddProject } from "@/components/AddProject";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

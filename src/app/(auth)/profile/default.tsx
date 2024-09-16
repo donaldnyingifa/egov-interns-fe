@@ -14,6 +14,7 @@ import { ChangeEvent, useRef, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { API } from "../../../api";
 import { ProfileImage } from "@/components/ProfileImage";
+import Link from "next/link";
 
 export default function Page() {
   const router = useRouter();
@@ -105,6 +106,9 @@ export default function Page() {
 
           <div className="flex gap-2">
             <EditProfile />
+            {/* <Button size="sm" variant="outline">
+              <Link href="/profile/edit">Edit profile</Link>
+            </Button> */}
             <Button onClick={() => logout()} size="sm" variant="outline">
               Logout
             </Button>

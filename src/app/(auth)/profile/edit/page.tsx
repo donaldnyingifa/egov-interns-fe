@@ -1,16 +1,10 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -18,14 +12,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { Input } from "./ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { Calendar } from "./ui/calendar";
+import { Calendar } from "@/components/ui/calendar";
 import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 const FormSchema = z.object({
   firstName: z.string().min(1, { message: "Your first name is required" }),
@@ -48,11 +47,12 @@ const FormSchema = z.object({
   }),
 });
 
-export const EditProfile = () => {
+export default function Page() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const { user, updateProfile } = useAuth();
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -71,8 +71,8 @@ export const EditProfile = () => {
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     try {
       setLoading(true);
-      console.log(data);
       await updateProfile(data);
+      router.back();
     } finally {
       setIsOpen(false);
       setLoading(false);
@@ -80,18 +80,13 @@ export const EditProfile = () => {
   };
 
   return (
-    <Dialog onOpenChange={setIsOpen} open={isOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" variant="outline">
-          Edit profile
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="overflow-y-scroll h-full sm:h-[90%]">
+    <div>
+      <div>
         <div>
-          <DialogTitle>Edit profile</DialogTitle>
-          <DialogDescription className="mt-2">
+          <h1>Edit profile</h1>
+          <p>
             Make changes to your profile here. Click save when you&apos;re done.
-          </DialogDescription>
+          </p>
         </div>
 
         <Form {...form}>
@@ -268,7 +263,7 @@ export const EditProfile = () => {
             </Button>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
-};
+}
