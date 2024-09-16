@@ -91,8 +91,8 @@ export const AddProject = () => {
           <span>Add Project</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="overflow-y-auto h-full sm:h-[90%]">
-        <div>
+      <DialogContent className="overflow-y-auto h-full sm:h-[90%] display flex flex-col gap-4">
+        <div className="space-y-2">
           <DialogTitle>Add a project</DialogTitle>
           <DialogDescription className="mt-2">
             Add a project to your project list.

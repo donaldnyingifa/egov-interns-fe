@@ -86,8 +86,8 @@ export const EditProfile = () => {
           Edit profile
         </Button>
       </DialogTrigger>
-      <DialogContent className="overflow-y-scroll h-full sm:h-[90%]">
-        <div>
+      <DialogContent className="overflow-y-scroll h-full sm:h-[90%] flex flex-col gap-4">
+        <div className="space-y-2">
           <DialogTitle>Edit profile</DialogTitle>
           <DialogDescription className="mt-2">
             Make changes to your profile here. Click save when you&apos;re done.
