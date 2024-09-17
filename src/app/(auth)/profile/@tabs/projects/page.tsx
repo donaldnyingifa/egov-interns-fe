@@ -1,14 +1,37 @@
 "use client";
 
-import { fetchProjects } from "../../../../../api/project";
+import { deleteProject, fetchProjects } from "@/api/project";
 import { AddProject } from "@/components/AddProject";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
-import { EllipsisVertical, Github, Globe2, PencilRuler } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Github,
+  Globe2,
+  Loader2,
+  MoreVertical,
+  PencilRuler,
+} from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Project {
   id: string;
@@ -20,6 +43,8 @@ interface Project {
 }
 
 const Page = () => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const { data, isLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: fetchProjects,
@@ -27,6 +52,28 @@ const Page = () => {
   });
 
   const projects: Project[] = data?.data.data;
+
+  const queryClient = useQueryClient();
+
+  const closeProjectDeletion = () => {
+    setShowDeleteModal(false);
+    setProjectToDelete(null);
+  };
+
+  const { mutate, isPending: isDeleting } = useMutation({
+    mutationFn: deleteProject,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["projects"] });
+      toast({ description: "Project deleted successfully", duration: 1000 });
+      closeProjectDeletion();
+    },
+    onError: (error: any) => {
+      toast({
+        description: error.response.data.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   if (isLoading) {
     return (
@@ -45,7 +92,6 @@ const Page = () => {
                   <Skeleton className="h-1 w-1 rounded-full" />
                 </div>
               </div>
-
               <Skeleton className="h-4 w-[250px] mt-3" />
               <Skeleton className="h-4 w-24 mt-6" />
               <div className="flex items-center gap-2 mt-2">
@@ -53,7 +99,6 @@ const Page = () => {
                 <Skeleton className="h-5 w-16" />
                 <Skeleton className="h-5 w-16" />
               </div>
-
               <div className="flex justify-between mt-12">
                 <Skeleton className="h-10 w-28" />
                 <Skeleton className="h-10 w-28" />
@@ -81,13 +126,31 @@ const Page = () => {
             >
               <div className="flex items-center justify-between">
                 <h2 className="font-bold">{project.name}</h2>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-6 w-6 rounded-full"
-                >
-                  <EllipsisVertical className="w-4 h-4" />
-                </Button>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      aria-haspopup="true"
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6 rounded-full"
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                      <span className="sr-only">Toggle menu</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setProjectToDelete(project.id);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
               <p className="text-sm mt-2">{project.description}</p>
               <h3 className="font-semibold mt-4 flex items-center gap-1">
@@ -139,6 +202,39 @@ const Page = () => {
             </div>
           ))}
       </div>
+
+      <AlertDialog open={showDeleteModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              project.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={closeProjectDeletion}
+              disabled={isDeleting}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeleting}
+              onClick={() => mutate(projectToDelete as string)}
+            >
+              {isDeleting ? (
+                <div className="flex items-center gap-1">
+                  <p>Deleting</p>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                </div>
+              ) : (
+                "Continue"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
