@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -25,9 +24,9 @@ import {
 import { Input } from "./ui/input";
 import { Loader2Icon, PlusCircle } from "lucide-react";
 import { Textarea } from "./ui/textarea";
-import { API } from "../api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addProject } from "../api/project";
+import { toast } from "./ui/use-toast";
 
 const FormSchema = z.object({
   name: z.string().min(1, { message: "Project name is required" }),
@@ -51,7 +50,6 @@ const FormSchema = z.object({
 
 export const AddProject = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -66,21 +64,23 @@ export const AddProject = () => {
 
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  const { mutate, isPending: isAdding } = useMutation({
     mutationFn: addProject,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["projects"] });
+      setIsOpen(false);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        description: error.response.data.message,
+        variant: "destructive",
+      });
     },
   });
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    try {
-      setLoading(true);
-      mutation.mutate(data);
-    } finally {
-      setIsOpen(false);
-      setLoading(false);
-    }
+    mutate(data);
   };
 
   return (
@@ -174,9 +174,12 @@ export const AddProject = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="mt-8" disabled={loading}>
-              {loading ? "Adding Project.." : "Add Project"}
-              {loading && <Loader2Icon className="w-4 h-4 animate-spin" />}
+            <Button
+              className="mt-8 flex gap-1 items-center"
+              disabled={isAdding}
+            >
+              <p>{isAdding ? "Adding Project" : "Add Project"}</p>
+              {isAdding && <Loader2Icon className="w-4 h-4 animate-spin" />}
             </Button>
           </form>
         </Form>
