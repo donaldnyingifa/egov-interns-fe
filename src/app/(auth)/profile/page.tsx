@@ -6,8 +6,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import {
   ArrowBigLeftDashIcon,
+  Book,
   CameraIcon,
   Loader2Icon,
+  Newspaper,
+  PencilRuler,
+  School,
   VerifiedIcon,
 } from "lucide-react";
 import { ChangeEvent, useRef, useState } from "react";
@@ -15,6 +19,10 @@ import { toast } from "@/components/ui/use-toast";
 import { API } from "../../../api";
 import { ProfileImage } from "@/components/ProfileImage";
 import Link from "next/link";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import UserProjects from "@/components/UserProjects";
+import UserPosts from "@/components/UserPosts";
 
 export default function Page() {
   const router = useRouter();
@@ -130,24 +138,8 @@ export default function Page() {
             {user.bio ?? "Feel free to follow me, I don't bite 😁"}
           </p>
 
-          <div className="flex mt-2 gap-2">
-            <svg
-              className="w-5 h-5 text-gray-800 dark:text-white"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 6.03v13m0-13c-2.819-.831-4.715-1.076-8.029-1.023A.99.99 0 0 0 3 6v11c0 .563.466 1.014 1.03 1.007 3.122-.043 5.018.212 7.97 1.023m0-13c2.819-.831 4.715-1.076 8.029-1.023A.99.99 0 0 1 21 6v11c0 .563-.466 1.014-1.03 1.007-3.122-.043-5.018.212-7.97 1.023"
-              />
-            </svg>
+          <div className="flex mt-2 gap-1.5">
+            <School className="w-5 h-5" />
 
             <p className="text-sm">
               {`${user.schoolName}, ${user.schoolDepartment}`}
@@ -155,6 +147,26 @@ export default function Page() {
           </div>
         </div>
       </div>
+
+      <Tabs defaultValue="posts" className="mt-6">
+        <TabsList className="w-full flex justify-between  gap-2">
+          <TabsTrigger value="posts" className="flex-1 flex items-center gap-2">
+            <Newspaper className="w-4 h-4" /> <span>Posts</span>
+          </TabsTrigger>
+          <TabsTrigger
+            value="projects"
+            className="flex-1 flex items-center gap-2"
+          >
+            <PencilRuler className="w-4 h-4" /> <span>Projects</span>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="posts">
+          <UserPosts />
+        </TabsContent>
+        <TabsContent value="projects">
+          <UserProjects />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

@@ -42,7 +42,7 @@ interface Project {
   githubRepo: string;
 }
 
-const Page = () => {
+const UserProjects = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const { data, isLoading } = useQuery({
@@ -239,4 +239,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default UserProjects;
