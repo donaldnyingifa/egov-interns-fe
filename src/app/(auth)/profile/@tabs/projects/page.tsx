@@ -4,10 +4,11 @@ import { fetchProjects } from "../../../../../api/project";
 import { AddProject } from "@/components/AddProject";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { EllipsisVertical, Github, Globe2, PencilRuler } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 interface Project {
   id: string;
@@ -28,7 +29,40 @@ const Page = () => {
   const projects: Project[] = data?.data.data;
 
   if (isLoading) {
-    return <div>loading</div>;
+    return (
+      <div className="space-y-6 mt-4">
+        {Array.from({ length: 2 }).map((_, index) => {
+          return (
+            <div
+              className="border-2 border-slate-100 shadow-sm py-6 px-4 rounded-lg"
+              key={index}
+            >
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-4 w-24" />
+                <div className="space-y-[2px]">
+                  <Skeleton className="h-1 w-1 rounded-full" />
+                  <Skeleton className="h-1 w-1 rounded-full" />
+                  <Skeleton className="h-1 w-1 rounded-full" />
+                </div>
+              </div>
+
+              <Skeleton className="h-4 w-[250px] mt-3" />
+              <Skeleton className="h-4 w-24 mt-6" />
+              <div className="flex items-center gap-2 mt-2">
+                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-5 w-16" />
+              </div>
+
+              <div className="flex justify-between mt-12">
+                <Skeleton className="h-10 w-28" />
+                <Skeleton className="h-10 w-28" />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
   }
 
   return (
@@ -38,6 +72,7 @@ const Page = () => {
         <AddProject />
       </div>
       <div className="space-y-6 mt-4">
+        {projects.length === 0 && <p>No projects to show</p>}
         {projects &&
           projects.map((project) => (
             <div
@@ -63,13 +98,6 @@ const Page = () => {
                   {project.technologies
                     .split(",")
                     .map((item: string, id: number) => (
-                      // <div
-                      //   key={id}
-                      //   className="flex gap-2 items-center p-1 border rounded-sm  border-slate-700"
-                      // >
-                      //   <Atom className="w-4 h-4" />
-                      //   <p className="text-xs">React JS</p>
-                      // </div>
                       <Badge
                         key={id}
                         variant="secondary"
