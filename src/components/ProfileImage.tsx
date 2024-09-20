@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "./ui/button";
 import Image from "next/image";
 
-export const ProfileImage = () => {
+export const ProfileImage = ({ profileData }: { profileData: any }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
   const [showImageFallback, setShowImageFallback] = useState(false);
@@ -20,13 +20,13 @@ export const ProfileImage = () => {
           {showImageFallback ? (
             <>
               <span>
-                {`${user.firstName[0].toUpperCase()}${user.lastName[0].toUpperCase()}`}
+                {`${profileData.firstName[0].toUpperCase()}${profileData.lastName[0].toUpperCase()}`}
               </span>
               <span className="sr-only">Profile Image</span>
             </>
           ) : (
             <Image
-              src={user.profileImage ?? "/"}
+              src={profileData.profileImage ?? "/"}
               alt="Profile Image"
               width={300}
               height={300}
@@ -44,7 +44,7 @@ export const ProfileImage = () => {
           </>
         ) : (
           <Image
-            src={user.profileImage ?? "/"}
+            src={profileData.profileImage ?? "/"}
             alt="Profile Image"
             width={300}
             height={300}

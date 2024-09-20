@@ -32,6 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Project {
   id: string;
@@ -42,12 +43,13 @@ interface Project {
   githubRepo: string;
 }
 
-const UserProjects = () => {
+const UserProjects = ({ userId }: { userId: string }) => {
+  const { user } = useAuth();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const { data, isLoading } = useQuery({
     queryKey: ["projects"],
-    queryFn: fetchProjects,
+    queryFn: () => fetchProjects(userId),
     staleTime: Infinity,
   });
 
@@ -61,7 +63,7 @@ const UserProjects = () => {
   };
 
   const { mutate, isPending: isDeleting } = useMutation({
-    mutationFn: deleteProject,
+    mutationFn: (projectId: string) => deleteProject(projectId, user.id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["projects"] });
       toast({ description: "Project deleted successfully", duration: 1000 });
@@ -114,7 +116,7 @@ const UserProjects = () => {
     <div className="mt-4">
       <div className="flex justify-between items-center">
         <p className="font-bold">Projects</p>
-        <AddProject />
+        {userId === user.id && <AddProject />}
       </div>
       <div className="space-y-6 mt-4">
         {projects.length === 0 && <p>No projects to show</p>}
@@ -127,30 +129,32 @@ const UserProjects = () => {
               <div className="flex items-center justify-between">
                 <h2 className="font-bold">{project.name}</h2>
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      aria-haspopup="true"
-                      size="icon"
-                      variant="ghost"
-                      className="h-6 w-6 rounded-full"
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                      <span className="sr-only">Toggle menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        setProjectToDelete(project.id);
-                        setShowDeleteModal(true);
-                      }}
-                    >
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                {userId === user.id && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        aria-haspopup="true"
+                        size="icon"
+                        variant="ghost"
+                        className="h-6 w-6 rounded-full"
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                        <span className="sr-only">Toggle menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>Edit</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setProjectToDelete(project.id);
+                          setShowDeleteModal(true);
+                        }}
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
               <p className="text-sm mt-2">{project.description}</p>
               <h3 className="font-semibold mt-4 flex items-center gap-1">

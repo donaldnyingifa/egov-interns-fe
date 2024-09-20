@@ -2,7 +2,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -26,6 +25,10 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "./ui/calendar";
 import { useAuth } from "@/hooks/useAuth";
+import { updateUserProfile } from "@/api/auth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "./ui/use-toast";
+import { useRouter } from "next/navigation";
 
 const FormSchema = z.object({
   firstName: z.string().min(1, { message: "Your first name is required" }),
@@ -51,8 +54,8 @@ const FormSchema = z.object({
 export const EditProfile = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const { user, updateProfile } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -68,15 +71,29 @@ export const EditProfile = () => {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    try {
-      setLoading(true);
-      console.log(data);
-      await updateProfile(data);
-    } finally {
+  const queryClient = useQueryClient();
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data) => updateUserProfile(user.id, data),
+    onSuccess: async (data) => {
+      router.replace(`/${data.data.user.username}`);
+
+      await queryClient.invalidateQueries({ queryKey: ["profile"] });
       setIsOpen(false);
-      setLoading(false);
-    }
+      toast({
+        description: "Profile updated successfully",
+        duration: 1000,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        description: error.response.data.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    mutate(data as unknown as any);
   };
 
   return (
@@ -245,9 +262,9 @@ export const EditProfile = () => {
               )}
             />
 
-            <Button type="submit" className="mt-8" disabled={loading}>
-              {loading ? "Saving changes" : "Save changes"}
-              {loading && (
+            <Button type="submit" className="mt-8" disabled={isPending}>
+              {isPending ? "Saving changes" : "Save changes"}
+              {isPending && (
                 <svg
                   aria-hidden="true"
                   className="w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-white ml-4"

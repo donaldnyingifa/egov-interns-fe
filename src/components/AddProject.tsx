@@ -27,6 +27,7 @@ import { Textarea } from "./ui/textarea";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addProject } from "../api/project";
 import { toast } from "./ui/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const FormSchema = z.object({
   name: z.string().min(1, { message: "Project name is required" }),
@@ -50,6 +51,7 @@ const FormSchema = z.object({
 
 export const AddProject = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -65,7 +67,7 @@ export const AddProject = () => {
   const queryClient = useQueryClient();
 
   const { mutate, isPending: isAdding } = useMutation({
-    mutationFn: addProject,
+    mutationFn: (data) => addProject(data, user.id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["projects"] });
       setIsOpen(false);
@@ -80,7 +82,7 @@ export const AddProject = () => {
   });
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    mutate(data);
+    mutate(data as unknown as any);
   };
 
   return (

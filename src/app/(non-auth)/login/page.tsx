@@ -40,13 +40,7 @@ const Page = () => {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    try {
-      setIsLoading(true);
-      await login(data.username, data.password);
-    } catch (e) {
-    } finally {
-      setIsLoading(false);
-    }
+    await login({ username: data.username, password: data.password });
   }
 
   return (

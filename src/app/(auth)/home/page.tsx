@@ -16,7 +16,7 @@ const Page = () => {
       <div className="p-4 border-b flex gap-4 items-center">
         <div>
           <Link
-            href="/profile"
+            href={`/${user.username}`}
             className="w-10 h-10 block rounded-full overflow-hidden border-slate-200 border-2"
           >
             {showFallbackImage ? (
