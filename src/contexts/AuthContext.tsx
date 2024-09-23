@@ -51,44 +51,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log(error);
   }
 
-  const { mutate: login } = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await loginUser(data.username, data.password);
-      const token = response.data.token;
-      localStorage.setItem("token", token);
-      API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      return response;
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["profile"] });
-    },
-    onError: (error: any) => {
-      toast({
-        description: error.response.data.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const { mutate: signup } = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await registerUser(data);
-      const token = response.data.token;
-      localStorage.setItem("token", token);
-      API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      return response;
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["profile"] });
-    },
-    onError: (error: any) => {
-      toast({
-        description: error.response.data.message,
-        variant: "destructive",
-      });
-    },
-  });
-
   const logout = async () => {
     try {
       localStorage.removeItem("token");
@@ -105,7 +67,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <authContext.Provider
-      value={{ user, loading, error, login, logout, signup }}
+      value={{
+        user,
+        loading,
+        error,
+        logout,
+      }}
     >
       {children}
     </authContext.Provider>
