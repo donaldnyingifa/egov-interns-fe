@@ -2,6 +2,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   ArrowBigLeftDashIcon,
   CameraIcon,
+  Check,
   Copy,
   Loader2Icon,
   Newspaper,
@@ -19,7 +20,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "./ui/use-toast";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
-import Username from "@/app/(auth)/[username]/_components/Username";
 
 const UserProfile = ({ profileData }: { profileData: any }) => {
   const { user, setUser, logout } = useAuth();
@@ -79,7 +79,14 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
     }`;
     await navigator.clipboard.writeText(data);
     toast({
-      description: <div className="bg-gren">Profile link copied</div>,
+      description: (
+        <div className="flex gap-2 items-center">
+          {" "}
+          <Check className="bg-green-500 text-white w-5 h-5 rounded-full p-0.5" />
+          <span>Profile link copied</span>
+        </div>
+      ),
+      duration: 1000,
     });
   };
 
