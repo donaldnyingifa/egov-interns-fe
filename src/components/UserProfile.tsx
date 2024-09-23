@@ -2,6 +2,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   ArrowBigLeftDashIcon,
   CameraIcon,
+  Copy,
   Loader2Icon,
   Newspaper,
   PencilRuler,
@@ -18,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "./ui/use-toast";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import Username from "@/app/(auth)/[username]/_components/Username";
 
 const UserProfile = ({ profileData }: { profileData: any }) => {
   const { user, setUser, logout } = useAuth();
@@ -68,6 +70,17 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
 
   const handleImageUpload = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleCopyProfileLink = async () => {
+    const { protocol, hostname, port } = window.location;
+    const data = `${protocol}//${hostname}${port ?? ""}/${
+      profileData.username
+    }`;
+    await navigator.clipboard.writeText(data);
+    toast({
+      description: <div className="bg-gren">Profile link copied</div>,
+    });
   };
 
   return (
@@ -138,7 +151,13 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
               <VerifiedIcon className="fill-blue-500 text-white w-5 h-5" />
             </span>
 
-            <span>@{profileData.username}</span>
+            <div
+              className="flex items-center gap-1 cursor-pointer"
+              onClick={handleCopyProfileLink}
+            >
+              <p>@{profileData.username}</p>
+              <Copy className="w-4 h-4" />
+            </div>
           </div>
 
           <p className="mt-2 text-sm">
