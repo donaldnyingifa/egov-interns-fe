@@ -79,6 +79,7 @@ export const EditProfile = () => {
 
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
       setIsOpen(false);
+      form.reset();
       toast({
         description: "Profile updated successfully",
         duration: 1000,
@@ -96,8 +97,15 @@ export const EditProfile = () => {
     mutate(data as unknown as any);
   };
 
+  const handleOnOpenChange = (open: boolean) => {
+    if (!open) {
+      form.reset();
+    }
+    setIsOpen(open);
+  };
+
   return (
-    <Dialog onOpenChange={setIsOpen} open={isOpen}>
+    <Dialog onOpenChange={handleOnOpenChange} open={isOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
           Edit profile
