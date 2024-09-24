@@ -11,6 +11,7 @@ export const ProfileImage = ({ profileData }: { profileData: any }) => {
 
   useEffect(() => {
     setShowImageFallback(false);
+    console.log("profile image changed");
   }, [user]);
 
   return (

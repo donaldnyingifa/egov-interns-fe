@@ -44,7 +44,7 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
         });
       }
 
-      setUser({ ...user, imageUrl: data?.data.imageUrl });
+      setUser({ ...user, profileImage: data?.data.imageUrl });
 
       fileInputRef.current!.value = "";
     },
