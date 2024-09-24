@@ -20,39 +20,36 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "./ui/use-toast";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const UserProfile = ({ profileData }: { profileData: any }) => {
-  const { user, setUser, logout } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
-  const [isUploading, setisUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const uploadImage = async (file: File) => {
-    const formData = new FormData();
-    formData.append("profileImage", file);
-
-    try {
-      setisUploading(true);
-
-      const response = await API.post("/uploadimage", formData, {
+  const queryClient = useQueryClient();
+  const { mutate: uploadImage, isPending: isUploading } = useMutation({
+    mutationFn: (data) =>
+      API.post("/uploadimage", data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+      }),
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["profile"],
       });
-
-      setUser((prev: any) => ({
-        ...prev,
-        profileImage: response.data.imageUrl,
-      }));
-    } catch (error: any) {
-      console.log(error);
-
-      toast({ description: error.response.data.error });
-    } finally {
+    },
+    onError: (error: any) => {
+      toast({
+        description: error.response.data.message,
+        variant: "destructive",
+      });
+    },
+    onSettled: () => {
       fileInputRef.current!.value = "";
-      setisUploading(false);
-    }
-  };
+    },
+  });
 
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0];
@@ -64,7 +61,10 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
         return toast({ description: "Maxiumum picture size allowed is 2MB" });
       }
 
-      await uploadImage(file);
+      const formData = new FormData();
+      formData.append("profileImage", file);
+
+      uploadImage(formData as unknown as any);
     }
   };
 
@@ -80,13 +80,13 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
     await navigator.clipboard.writeText(data);
     toast({
       description: (
-        <div className="flex gap-2 items-center">
-          {" "}
+        <div className="flex gap-2 items-center p-3">
           <Check className="bg-green-500 text-white w-5 h-5 rounded-full p-0.5" />
           <span>Profile link copied</span>
         </div>
       ),
       duration: 1000,
+      style: { height: "min-content", padding: 0 },
     });
   };
 
@@ -142,7 +142,7 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
 
           {profileData.id === user.id && (
             <div className="flex gap-2">
-              <EditProfile />
+              <EditProfile profileData={profileData} />
               <Button onClick={() => logout()} size="sm" variant="outline">
                 Logout
               </Button>

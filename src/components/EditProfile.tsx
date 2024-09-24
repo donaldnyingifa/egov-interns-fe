@@ -51,53 +51,49 @@ const FormSchema = z.object({
   }),
 });
 
-export const EditProfile = () => {
+export const EditProfile = ({ profileData }: { profileData: any }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const { user } = useAuth();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      username: user.username,
-      email: user.email,
-      bio: user.bio ?? "Feel free to follow me, I don't bite 😁",
-      schoolName: user.schoolName,
-      schoolDepartment: user.schoolDepartment,
-      dob: new Date(user.dob),
+      firstName: profileData.firstName,
+      lastName: profileData.lastName,
+      username: profileData.username,
+      email: profileData.email,
+      bio: profileData.bio ?? "Feel free to follow me, I don't bite 😁",
+      schoolName: profileData.schoolName,
+      schoolDepartment: profileData.schoolDepartment,
+      dob: new Date(profileData.dob),
     },
   });
 
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
-    mutationFn: (data) => updateUserProfile(user.id, data),
-    onSuccess: async (data) => {
-      router.replace(`/${data.data.user.username}`);
+    mutationFn: (data) => updateUserProfile(profileData.id, data),
+    onSettled: async (data, error: any) => {
+      if (error) {
+        return toast({
+          description: error.response.data.message,
+          variant: "destructive",
+        });
+      }
 
-      await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["profile"],
+      });
+
       setIsOpen(false);
-      form.reset();
-      toast({
-        description: "Profile updated successfully",
-        duration: 1000,
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        description: error.response.data.message,
-        variant: "destructive",
-      });
+      router.replace(`/${data?.data.user.username}`);
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+  const onSubmit = (data: z.infer<typeof FormSchema>) =>
     mutate(data as unknown as any);
-  };
 
-  const handleOnOpenChange = (open: boolean) => {
+  const onOpenChange = (open: boolean) => {
     if (!open) {
       form.reset();
     }
@@ -105,7 +101,7 @@ export const EditProfile = () => {
   };
 
   return (
-    <Dialog onOpenChange={handleOnOpenChange} open={isOpen}>
+    <Dialog onOpenChange={onOpenChange} open={isOpen || isPending}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
           Edit profile
@@ -252,7 +248,7 @@ export const EditProfile = () => {
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={field.value ?? new Date(user.dob)}
+                        selected={field.value ?? new Date(profileData.dob)}
                         onSelect={(e) => {
                           field.onChange(e);
                           setIsCalendarOpen(false);
