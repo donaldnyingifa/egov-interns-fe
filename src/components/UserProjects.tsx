@@ -31,8 +31,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/useAuth";
+import { EditProject } from "./EditProject";
 
 interface Project {
   id: string;
@@ -47,6 +49,9 @@ const UserProjects = ({ userId }: { userId: string }) => {
   const { user } = useAuth();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [projectToEdit, setProjectToEdit] = useState<any>(null);
+  const [showDropDownMenu, setShowDropDownMenu] = useState(false);
   const { data, isLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: () => fetchProjects(userId),
@@ -130,7 +135,10 @@ const UserProjects = ({ userId }: { userId: string }) => {
                 <h2 className="font-bold">{project.name}</h2>
 
                 {userId === user.id && (
-                  <DropdownMenu>
+                  <DropdownMenu
+                    onOpenChange={setShowDropDownMenu}
+                    open={showDropDownMenu}
+                  >
                     <DropdownMenuTrigger asChild>
                       <Button
                         aria-haspopup="true"
@@ -143,7 +151,15 @@ const UserProjects = ({ userId }: { userId: string }) => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setShowDropDownMenu(false);
+                          setProjectToEdit(project);
+                          setShowEditModal(true);
+                        }}
+                      >
+                        Edit
+                      </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
                           setProjectToDelete(project.id);
@@ -208,6 +224,7 @@ const UserProjects = ({ userId }: { userId: string }) => {
       </div>
 
       <AlertDialog open={showDeleteModal}>
+        <AlertDialogTrigger></AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -239,6 +256,12 @@ const UserProjects = ({ userId }: { userId: string }) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <EditProject
+        show={showEditModal}
+        setShow={setShowEditModal}
+        project={projectToEdit}
+      />
     </div>
   );
 };
