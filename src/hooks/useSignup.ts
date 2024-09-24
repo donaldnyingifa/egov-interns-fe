@@ -2,9 +2,11 @@ import { API } from "@/api";
 import { registerUser } from "@/api/auth";
 import { toast } from "@/components/ui/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "./useAuth";
 
 const useSignup = () => {
   const queryClient = useQueryClient();
+  const { setUser } = useAuth();
 
   const { mutate: signup, isPending: isSigningUp } = useMutation({
     mutationFn: async (data: any) => {
@@ -14,8 +16,8 @@ const useSignup = () => {
       API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       return response;
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["profile"] });
+    onSuccess: async (data) => {
+      setUser(data);
     },
     onError: (error: any) => {
       toast({

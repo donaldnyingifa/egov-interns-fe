@@ -55,6 +55,7 @@ export const EditProfile = ({ profileData }: { profileData: any }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const router = useRouter();
+  const { setUser } = useAuth();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -70,7 +71,7 @@ export const EditProfile = ({ profileData }: { profileData: any }) => {
     },
   });
 
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
     mutationFn: (data) => updateUserProfile(profileData.id, data),
     onSettled: async (data, error: any) => {
@@ -81,12 +82,9 @@ export const EditProfile = ({ profileData }: { profileData: any }) => {
         });
       }
 
-      await queryClient.invalidateQueries({
-        queryKey: ["profile"],
-      });
-
-      setIsOpen(false);
+      setUser(data?.data.user);
       router.replace(`/${data?.data.user.username}`);
+      setIsOpen(false);
     },
   });
 

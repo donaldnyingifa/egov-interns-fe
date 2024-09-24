@@ -20,14 +20,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "./ui/use-toast";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 const UserProfile = ({ profileData }: { profileData: any }) => {
-  const { user, logout } = useAuth();
+  const { user, setUser, logout } = useAuth();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const queryClient = useQueryClient();
   const { mutate: uploadImage, isPending: isUploading } = useMutation({
     mutationFn: (data) =>
       API.post("/uploadimage", data, {
@@ -35,18 +34,18 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
           "Content-Type": "multipart/form-data",
         },
       }),
-    onSuccess: async (data) => {
-      await queryClient.invalidateQueries({
-        queryKey: ["profile"],
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        description: error.response.data.message,
-        variant: "destructive",
-      });
-    },
-    onSettled: () => {
+    onSettled: (data, error: any) => {
+      if (error) {
+        fileInputRef.current!.value = "";
+
+        return toast({
+          description: error.response.data.message,
+          variant: "destructive",
+        });
+      }
+
+      setUser({ ...user, imageUrl: data?.data.imageUrl });
+
       fileInputRef.current!.value = "";
     },
   });

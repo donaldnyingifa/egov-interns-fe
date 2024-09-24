@@ -1,24 +1,17 @@
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getUserByUsername } from "@/api/user";
 import UserProfile from "@/components/UserProfile";
 import { useMemo } from "react";
 
 export default function Page({ params }: { params: { username: string } }) {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
 
   const shouldFetchUser = useMemo(() => {
-    const profileQueryState = queryClient.getQueryState(["profile"]);
-
-    if (profileQueryState?.fetchStatus === "fetching") {
-      return false;
-    }
-
     return params.username !== user?.username;
-  }, [params.username, queryClient, user]);
+  }, [params.username, user]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["profile", params.username],
@@ -35,8 +28,8 @@ export default function Page({ params }: { params: { username: string } }) {
     refetchOnWindowFocus: false,
   });
 
-  if (isLoading) {
-    return <div>loading</div>;
+  if (shouldFetchUser && isLoading) {
+    return <div>Loading...</div>;
   }
 
   if (error) {
