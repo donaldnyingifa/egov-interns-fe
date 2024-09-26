@@ -48,10 +48,9 @@ interface Project {
 const UserProjects = ({ userId }: { userId: string }) => {
   const { user } = useAuth();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [projectToEdit, setProjectToEdit] = useState<any>(null);
-  const [showDropDownMenu, setShowDropDownMenu] = useState(false);
+  const [showDropdownMenu, setShowDropdownMenu] = useState(false);
+  const [activeProject, setActiveProject] = useState<any>(null);
   const { data, isLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: () => fetchProjects(userId),
@@ -64,7 +63,7 @@ const UserProjects = ({ userId }: { userId: string }) => {
 
   const closeProjectDeletion = () => {
     setShowDeleteModal(false);
-    setProjectToDelete(null);
+    setActiveProject(null);
   };
 
   const { mutate, isPending: isDeleting } = useMutation({
@@ -136,8 +135,13 @@ const UserProjects = ({ userId }: { userId: string }) => {
 
                 {userId === user.id && (
                   <DropdownMenu
-                    onOpenChange={setShowDropDownMenu}
-                    open={showDropDownMenu}
+                    onOpenChange={(open) => {
+                      if (open) {
+                        return setActiveProject(project);
+                      }
+                      setShowDropdownMenu(false);
+                    }}
+                    open={showDropdownMenu && activeProject?.id === project.id}
                   >
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -145,6 +149,7 @@ const UserProjects = ({ userId }: { userId: string }) => {
                         size="icon"
                         variant="ghost"
                         className="h-6 w-6 rounded-full"
+                        onClick={() => setShowDropdownMenu(true)}
                       >
                         <MoreVertical className="h-4 w-4" />
                         <span className="sr-only">Toggle menu</span>
@@ -153,16 +158,14 @@ const UserProjects = ({ userId }: { userId: string }) => {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
                         onClick={() => {
-                          setShowDropDownMenu(false);
-                          setProjectToEdit(project);
                           setShowEditModal(true);
+                          setShowDropdownMenu(false);
                         }}
                       >
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
-                          setProjectToDelete(project.id);
                           setShowDeleteModal(true);
                         }}
                       >
@@ -242,7 +245,7 @@ const UserProjects = ({ userId }: { userId: string }) => {
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={isDeleting}
-              onClick={() => mutate(projectToDelete as string)}
+              onClick={() => mutate(activeProject.id)}
             >
               {isDeleting ? (
                 <div className="flex items-center gap-1">
@@ -260,7 +263,7 @@ const UserProjects = ({ userId }: { userId: string }) => {
       <EditProject
         show={showEditModal}
         setShow={setShowEditModal}
-        project={projectToEdit}
+        project={activeProject}
       />
     </div>
   );
