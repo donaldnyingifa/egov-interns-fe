@@ -14,7 +14,7 @@ export const getProfileByUsername = async (username: string) => {
 
 export const uploadProfileImage = async (data: any) => {
   return (
-    await API.post("/profile/image", data, {
+    await API.patch("/profile/me/image", data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
