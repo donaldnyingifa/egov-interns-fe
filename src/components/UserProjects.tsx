@@ -57,7 +57,7 @@ const UserProjects = ({ userId }: { userId: string }) => {
     staleTime: Infinity,
   });
 
-  const projects: Project[] = data?.data.data;
+  const projects: Project[] = data.data;
 
   const queryClient = useQueryClient();
 

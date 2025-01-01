@@ -13,9 +13,9 @@ export const editProject = async (
 };
 
 export const fetchProjects = async (userId: string) => {
-  return await API.get(`/users/${userId}/projects`);
+  return (await API.get(`/users/${userId}/projects`)).data;
 };
 
 export const deleteProject = async (projectId: string, userId: string) => {
-  return await API.delete(`users/${userId}/projects/${projectId}`);
+  await API.delete(`users/${userId}/projects/${projectId}`);
 };

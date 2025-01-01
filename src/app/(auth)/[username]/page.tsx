@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
-import { getUserByUsername } from "@/api/user";
+import { getProfileByUsername } from "@/api/profile";
 import UserProfile from "@/components/UserProfile";
 import { useMemo } from "react";
 
@@ -17,8 +17,8 @@ export default function Page({ params }: { params: { username: string } }) {
     queryKey: ["profile", params.username],
     queryFn: async () => {
       if (shouldFetchUser) {
-        const response = await getUserByUsername(params.username);
-        return response.data.user;
+        const response = await getProfileByUsername(params.username);
+        return response.profile;
       }
 
       return user;

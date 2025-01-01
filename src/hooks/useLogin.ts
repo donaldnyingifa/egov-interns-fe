@@ -10,13 +10,13 @@ const useLogin = () => {
   const { mutate: login, isPending: isLoggingIn } = useMutation({
     mutationFn: async (data: any) => {
       const response = await loginUser(data.username, data.password);
-      const token = response.data.token;
+      const token = response.token;
       localStorage.setItem("token", token);
       API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       return response;
     },
     onSuccess: async (data) => {
-      setUser(data?.data.user);
+      setUser(data.user);
     },
     onError: (error: any) => {
       toast({

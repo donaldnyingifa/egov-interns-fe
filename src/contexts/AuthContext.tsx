@@ -2,11 +2,11 @@
 import React, { createContext, ReactNode, useState } from "react";
 import { API } from "../api";
 import { toast } from "@/components/ui/use-toast";
-import { getUserProfile } from "../api/auth";
+import { getUserProfile } from "../api/profile";
 import { useQuery } from "@tanstack/react-query";
 
 export type UserData = {
-  id: "string";
+  id: string;
   email: string;
   password: string;
   username: string;
@@ -28,9 +28,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const token = localStorage.getItem("token");
       if (token) {
         API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        const response = (await getUserProfile()).data.user;
-        setUser(response);
-        return response;
+        const response = await getUserProfile();
+        setUser(response.profile);
+        return response.profile;
       }
       return null;
     },
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
 
   if (error && (error as any).response.status === 401) {
-    toast({ description: (error as any).response.data.message });
+    toast({ description: (error as any).response.message });
     localStorage.removeItem("token");
     setUser(null);
   }

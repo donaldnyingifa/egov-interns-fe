@@ -25,7 +25,7 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "./ui/calendar";
 import { useAuth } from "@/hooks/useAuth";
-import { updateUserProfile } from "@/api/auth";
+import { updateUserProfile } from "@/api/profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "./ui/use-toast";
 import { useRouter } from "next/navigation";
@@ -71,7 +71,6 @@ export const EditProfile = ({ profileData }: { profileData: any }) => {
     },
   });
 
-  // const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
     mutationFn: (data) => updateUserProfile(profileData.id, data),
     onSettled: async (data, error: any) => {
@@ -82,8 +81,8 @@ export const EditProfile = ({ profileData }: { profileData: any }) => {
         });
       }
 
-      setUser(data?.data.user);
-      router.replace(`/${data?.data.user.username}`);
+      setUser(data.profile);
+      router.replace(`/${data.profile.username}`);
       setIsOpen(false);
     },
   });

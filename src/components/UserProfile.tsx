@@ -21,6 +21,7 @@ import { toast } from "./ui/use-toast";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
+import { uploadProfileImage } from "@/api/profile";
 
 const UserProfile = ({ profileData }: { profileData: any }) => {
   const { user, setUser, logout } = useAuth();
@@ -28,23 +29,18 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { mutate: uploadImage, isPending: isUploading } = useMutation({
-    mutationFn: (data) =>
-      API.post("/uploadimage", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }),
+    mutationFn: (data) => uploadProfileImage(data),
     onSettled: (data, error: any) => {
       if (error) {
         fileInputRef.current!.value = "";
 
         return toast({
-          description: error.response.data.message,
+          description: error.response.message,
           variant: "destructive",
         });
       }
 
-      setUser({ ...user, profileImage: data?.data.imageUrl });
+      setUser({ ...user, profileImage: data.imageUrl });
 
       fileInputRef.current!.value = "";
     },
@@ -73,9 +69,10 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
 
   const handleCopyProfileLink = async () => {
     const { protocol, hostname, port } = window.location;
-    const data = `${protocol}//${hostname}${port ?? ""}/${
+    const data = `${protocol}//${hostname}${port ? ":" + port : ""}/${
       profileData.username
     }`;
+
     await navigator.clipboard.writeText(data);
     toast({
       description: (
@@ -88,6 +85,8 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
       style: { height: "min-content", padding: 0 },
     });
   };
+
+  const isAuthUser = profileData.id === user.id;
 
   return (
     <div>
@@ -102,7 +101,7 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
             <ArrowBigLeftDashIcon />
           </Button>
 
-          {profileData.id === user.id ? (
+          {isAuthUser ? (
             <h1 className="text-bold text-lg font-bold">
               {profileData.firstName}
             </h1>
@@ -122,7 +121,7 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
             />
             <ProfileImage profileData={profileData} />
 
-            {profileData.id === user.id && (
+            {isAuthUser && (
               <Button
                 size="icon"
                 variant="outline"
@@ -139,7 +138,7 @@ const UserProfile = ({ profileData }: { profileData: any }) => {
             )}
           </div>
 
-          {profileData.id === user.id && (
+          {isAuthUser && (
             <div className="flex gap-2">
               <EditProfile profileData={profileData} />
               <Button onClick={() => logout()} size="sm" variant="outline">

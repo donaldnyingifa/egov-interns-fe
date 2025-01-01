@@ -5,19 +5,18 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "./useAuth";
 
 const useSignup = () => {
-  const queryClient = useQueryClient();
   const { setUser } = useAuth();
 
   const { mutate: signup, isPending: isSigningUp } = useMutation({
     mutationFn: async (data: any) => {
       const response = await registerUser(data);
-      const token = response.data.token;
+      const token = response.token;
       localStorage.setItem("token", token);
       API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       return response;
     },
     onSuccess: async (data) => {
-      setUser(data);
+      setUser(data.user);
     },
     onError: (error: any) => {
       toast({

@@ -12,7 +12,7 @@ const Page = () => {
   const [showFallbackImage, setShowFallbackImage] = useState(false);
 
   return (
-    <div className="max-w-lg mx-auto border min-h-screen">
+    <div>
       <div className="p-4 border-b flex gap-4 items-center">
         <div>
           <Link
