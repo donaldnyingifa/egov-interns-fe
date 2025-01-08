@@ -30,29 +30,26 @@ const Layout = ({ children }: { children: ReactNode }) => {
         <div className="rounded-lg p-1 w-full mx-auto flex flex-col gap-2">
           <Link
             href="/home"
-            className={`flex items-center md:gap-2 p-2 rounded-md text-white ${
+            className={`flex items-center md:gap-2 p-2 rounded-md ${
               pathname === "/home"
                 ? "bg-slate-900 text-white"
                 : "bg-white text-slate-900"
             }`}
           >
             <HomeIcon className="w-6 h-6" />
-            <p className="hidden md:block text-sm">Home</p>{" "}
+            <p className="hidden md:block text-sm">Home</p>
           </Link>
 
           <Link
             href={`/${user.username}`}
-            className={`flex items-center md:gap-2 p-2 rounded-md  ${
+            className={`flex items-center md:gap-2 p-2 rounded-md ${
               pathname === `/${user.username}`
                 ? "bg-slate-900 text-white"
                 : "bg-white text-slate-900"
             }`}
           >
             {/* <User className="w-5 h-5" /> */}
-            <Link
-              href={`/${user.username}`}
-              className="w-6 h-6 block rounded-full overflow-hidden"
-            >
+            <div className="w-6 h-6 block rounded-full overflow-hidden">
               {showFallbackImage ? (
                 <div className="grid place-items-center w-full h-full">
                   <span>
@@ -71,7 +68,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
                   onLoad={() => setShowFallbackImage(false)}
                 />
               )}
-            </Link>
+            </div>
             <p className="hidden md:block text-sm">Profile</p>
           </Link>
         </div>
